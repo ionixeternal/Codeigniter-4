@@ -1,4 +1,4 @@
-# CodeIgniter 4 Framework
+# CodeIgniter 4 Framework v3.1.11
 
 ## What is CodeIgniter?
 
