@@ -15,6 +15,12 @@ The user guide corresponding to this version of the framework can be found
 [here](https://codeigniter4.github.io/userguide/).
 
 
+## Install
+Easy install via composer.
+```
+git clone https://github.com/ionixeternal/Codeigniter-4.git
+```
+
 ## Important Change with index.php
 
 `index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
