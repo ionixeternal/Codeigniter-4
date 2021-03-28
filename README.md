@@ -16,9 +16,26 @@ The user guide corresponding to this version of the framework can be found
 
 
 ## Install
-Easy install via composer.
+Easy install via composer. Still no idea what composer is? Inform yourself [here](https://getcomposer.org/)
 ```
 git clone https://github.com/ionixeternal/Codeigniter-4.git
+```
+
+
+## Install Vendor
+After you clone the repository, just install vendor first
+```
+composer install
+```
+
+## Run
+To run your project, type this in the command
+```
+php spark serve
+```
+and now you can access at
+```
+http://localhost:8080
 ```
 
 ## Important Change with index.php
