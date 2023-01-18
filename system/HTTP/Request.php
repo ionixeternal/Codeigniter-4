@@ -1,131 +1,118 @@
 <?php
 
 /**
- * This file is part of the CodeIgniter 4 framework.
+ * This file is part of CodeIgniter 4 framework.
  *
  * (c) CodeIgniter Foundation <admin@codeigniter.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
 
 namespace CodeIgniter\HTTP;
 
 use CodeIgniter\Validation\FormatRules;
+use Config\App;
 
 /**
- * Representation of an HTTP request.
+ * Representation of an incoming, server-side HTTP request.
  */
-class Request extends Message implements MessageInterface, RequestInterface
+class Request extends OutgoingRequest implements RequestInterface
 {
-	use RequestTrait;
+    use RequestTrait;
 
-	/**
-	 * Proxy IPs
-	 *
-	 * @var string|array
-	 *
-	 * @deprecated Check the App config directly
-	 */
-	protected $proxyIPs;
+    /**
+     * Proxy IPs
+     *
+     * @var array<string, string>
+     *
+     * @deprecated Check the App config directly
+     */
+    protected $proxyIPs;
 
-	/**
-	 * Request method.
-	 *
-	 * @var string
-	 */
-	protected $method;
+    /**
+     * Constructor.
+     *
+     * @param App $config
+     *
+     * @deprecated The $config is no longer needed and will be removed in a future version
+     */
+    public function __construct($config = null)
+    {
+        /**
+         * @deprecated $this->proxyIps property will be removed in the future
+         */
+        $this->proxyIPs = $config->proxyIPs;
 
-	/**
-	 * A URI instance.
-	 *
-	 * @var URI
-	 */
-	protected $uri;
+        if (empty($this->method)) {
+            $this->method = $this->getServer('REQUEST_METHOD') ?? 'GET';
+        }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param object $config
-	 *
-	 * @deprecated The $config is no longer needed and will be removed in a future version
-	 */
-	public function __construct($config = null)
-	{
-		/** @deprecated $this->proxyIps property will be removed in the future */
-		$this->proxyIPs = $config->proxyIPs;
+        if (empty($this->uri)) {
+            $this->uri = new URI();
+        }
+    }
 
-		if (empty($this->method))
-		{
-			$this->method = $this->getServer('REQUEST_METHOD') ?? 'GET';
-		}
+    /**
+     * Validate an IP address
+     *
+     * @param string $ip    IP Address
+     * @param string $which IP protocol: 'ipv4' or 'ipv6'
+     *
+     * @deprecated Use Validation instead
+     *
+     * @codeCoverageIgnore
+     */
+    public function isValidIP(?string $ip = null, ?string $which = null): bool
+    {
+        return (new FormatRules())->valid_ip($ip, $which);
+    }
 
-		if (empty($this->uri))
-		{
-			$this->uri = new URI();
-		}
-	}
+    /**
+     * Get the request method.
+     *
+     * @param bool $upper Whether to return in upper or lower case.
+     *
+     * @deprecated The $upper functionality will be removed and this will revert to its PSR-7 equivalent
+     *
+     * @codeCoverageIgnore
+     */
+    public function getMethod(bool $upper = false): string
+    {
+        return ($upper) ? strtoupper($this->method) : strtolower($this->method);
+    }
 
-	/**
-	 * Validate an IP address
-	 *
-	 * @param string $ip    IP Address
-	 * @param string $which IP protocol: 'ipv4' or 'ipv6'
-	 *
-	 * @return boolean
-	 *
-	 * @deprecated Use Validation instead
-	 */
-	public function isValidIP(string $ip = null, string $which = null): bool
-	{
-		return (new FormatRules())->valid_ip($ip, $which);
-	}
+    /**
+     * Sets the request method. Used when spoofing the request.
+     *
+     * @return $this
+     *
+     * @deprecated Use withMethod() instead for immutability
+     *
+     * @codeCoverageIgnore
+     */
+    public function setMethod(string $method)
+    {
+        $this->method = $method;
 
-	/**
-	 * Get the request method.
-	 *
-	 * @param boolean $upper Whether to return in upper or lower case.
-	 *
-	 * @return string
-	 *
-	 * @deprecated The $upper functionality will be removed and this will revert to its PSR-7 equivalent
-	 */
-	public function getMethod(bool $upper = false): string
-	{
-		return ($upper) ? strtoupper($this->method) : strtolower($this->method);
-	}
+        return $this;
+    }
 
-	/**
-	 * Sets the request method. Used when spoofing the request.
-	 *
-	 * @param string $method
-	 *
-	 * @return Request
-	 *
-	 * @deprecated Use withMethod() instead for immutability
-	 */
-	public function setMethod(string $method)
-	{
-		$this->method = $method;
+    /**
+     * Returns an instance with the specified method.
+     *
+     * @param string $method
+     *
+     * @return static
+     */
+    public function withMethod($method)
+    {
+        $request = clone $this;
 
-		return $this;
-	}
+        $request->method = $method;
 
-	/**
-	 * Returns an instance with the specified method.
-	 *
-	 * @param string $method
-	 *
-	 * @return static
-	 */
-	public function withMethod($method)
-	{
-		$request = clone $this;
-
-		$request->method = $method;
-
-		return $request;
-	}
+        return $request;
+    }
 
     /**
      * Retrieves the URI instance.
@@ -133,7 +120,7 @@ class Request extends Message implements MessageInterface, RequestInterface
      * @return URI
      */
     public function getUri()
-	{
-		return $this->uri;
-	}
+    {
+        return $this->uri;
+    }
 }
